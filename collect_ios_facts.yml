@@ -1,0 +1,30 @@
+---
+# Playbook: collect_ios_facts.yml
+# Purpose: Collect and display basic facts from Cisco IOS routers
+
+- name: Collect IOS facts from routers
+  hosts: routers                  # Target the 'routers' group in inventory
+  connection: network_cli         # Use network_cli for network device SSH connections
+  become: false                   # No privilege escalation needed for fact collection
+  gather_facts: false             # Disable default fact gathering (not supported on network devices)
+
+  vars:
+    ansible_network_os: ios       # Tell network_cli which OS plugin to use (Cisco IOS)
+
+  tasks:
+
+    # Collect device facts using the Cisco IOS facts module
+    - name: Gather IOS device facts
+      cisco.ios.ios_facts:
+        gather_subset:
+          - all                   # Collect all available facts (hardware, config, interfaces, etc.)
+
+    # Print the device hostname retrieved from facts
+    - name: Display device hostname
+      ansible.builtin.debug:
+        msg: "Hostname: {{ ansible_net_hostname }}"
+
+    # Print the IOS software version retrieved from facts
+    - name: Display IOS version
+      ansible.builtin.debug:
+        msg: "IOS Version: {{ ansible_net_version }}"
